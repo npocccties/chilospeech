@@ -1,6 +1,6 @@
 const reuseKeys = ['section','license','createdAt','updatedAt'];
 
-const bookProperties = {
+export const bookProperties = {
   name: "dc:title",
   description: "dc:description",
   publishedAt: "dcterms:created",
@@ -16,7 +16,7 @@ function adjustMetaKey(slides, book) {
     updatedAt: book.updatedAt
   };
   for (const slide of slides) {
-    for (key of reuseKeys) {
+    for (const key of reuseKeys) {
       if (typeof slide[key] === 'undefined' && typeof prev[key] !== 'undefined') {
         slide[key] = prev[key];
       }
@@ -26,17 +26,8 @@ function adjustMetaKey(slides, book) {
   }
 }
 
-function getProperty(tika, name) {
-  const prop = tika.html.head.meta.find(e => e.name === bookProperties[name]);
-  return typeof prop !== 'undefined'?prop.content:'';
-}
-
-function getPropertyAll(tika, name) {
-  return tika.html.head.meta.filter(e => e.name === name).map(e => e.content);
-}
-
 function getLanguage(slides) {
-  for (slide of slides) {
+  for (const slide of slides) {
     if (typeof slide.language !== 'undefined') {
       return slide.language;
     }
@@ -78,23 +69,39 @@ function convertTopics(topics) {
       }
     };
     addTopicProperty(ret, topic.slides[0]);
+    if (topic.slides[0].duration) {
+      const sum = topic.slides.reduce((acc,slide) => acc + slide.duration,0);
+      ret.timeRequired = sum > 1 ? Math.floor(sum) : 1;
+    } else {
+      topic.importJson = ret;
+    }
     return ret;
   });
 }
 
-function convert(tika, slides, sections) {
+function getBookKeywords(slides) {
+  let ret = [];
+  for (const slide of slides) {
+    if (slide.bookkeywords) {
+      ret.push(slide.bookkeywords);
+    }
+  }
+  return ret.flat();
+}
+
+export function convert(pptx, slides, sections) {
   const book = {};
   const language = getLanguage(slides);
 
   // book properties
   Object.keys(bookProperties).forEach(key => {
-    book[key] = getProperty(tika, key);
+    book[key] = pptx.getProperty(key);
   });
   if (language !== null){
     book.language = language;
   }
-  const keywords = getPropertyAll(tika, 'dc:subject');
-  book.keywords = keywords.concat(getPropertyAll(tika, 'cp:keywords'));
+
+  book.keywords = getBookKeywords(slides);
 
   adjustMetaKey(slides, book);
 
@@ -107,8 +114,4 @@ function convert(tika, slides, sections) {
   });
 
   return book;
-}
-
-module.exports = {
-  convert
 }

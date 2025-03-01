@@ -3,7 +3,12 @@ import cors from "cors";
 const router = express.Router();
 
 import bearerToken from 'express-bearer-token';
-router.use(bearerToken());
+router.use(bearerToken({
+  cookie: {
+    key: 'session_cookie'
+  }
+}));
+
 import { check } from './login.js';
 router.use(check);
 

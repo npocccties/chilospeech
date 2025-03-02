@@ -238,8 +238,10 @@ function App() {
       setError1(null);
       await openDirectory();
       readDirectory();
+      await submitLog({type: 'open-directory'});
     } catch(e) {
       setError1('ディレクトリを開くことができませんでした。\n' + e.message);
+      await submitLog({type: 'error', message: 'open-directory'});
     }
   }
 
@@ -272,11 +274,13 @@ function App() {
     try {
       setError2(null);
       await readPptx();
+      await submitLog({type: 'open-pptx', filename});
       setStep(steps.step3);
       chengeStep(2);
     } catch(e) {
       setError2(e.toString());
       setStep(steps.step3);
+      await submitLog({type: 'error', message: 'open-pptx'});
     }
   }
 
@@ -338,11 +342,13 @@ function App() {
       }
       finalTopicList(timerId);
       await processImportJson(topicCheckList);
+      await submitLog({type: 'output-video', filename, numtopics: numTopics});
       setStep(steps.step4);
     } catch(e){
       finalTopicList(timerId);
       setError3(e.message);
       setStep(steps.step3);
+      await submitLog({type: 'error', message: 'output-video'});
     }
   }
 
@@ -363,12 +369,14 @@ function App() {
     try {
       setError4(null);
       await flushZip();
+      await submitLog({type: 'save-video', filename});
       setPptxList([]);
       setFilename(null);
       setTopicList([]);
       readDirectory();
     } catch(e){
       setError4('zipファイルの保存に失敗しました。\n' + e.message);
+      await submitLog({type: 'error', message: 'save-video'});
     }
   }
 

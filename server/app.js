@@ -26,10 +26,19 @@ function pollyErrorHandler (err, req, res, next) {
 
 morgan.token('info', (req, res) => {
   if (!req.locals) return "- -";
-  let {id, user_id, len, message} = req.locals;
-  if (message) return "- " + message;
+  let {id, user_id, len, message, log} = req.locals;
+
+  // POST /login error
+  if (message) return "- error " + message;
+
+  // POST /login
   if (!id) id = "-";
   if (user_id) return `${id} ${user_id}`;
+
+  // POST /log
+  if (log) return `${id} ` + log.join(' ');
+
+  // POST /app/polly
   if (!len) len = 0;
   return `${id} ${len}`;
 });

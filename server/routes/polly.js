@@ -2,15 +2,8 @@ import express from "express";
 import cors from "cors";
 const router = express.Router();
 
-import bearerToken from 'express-bearer-token';
-router.use(bearerToken({
-  cookie: {
-    key: 'session_cookie'
-  }
-}));
-
-import { check } from './login.js';
-router.use(check);
+import { bearer, check, auth } from './login.js';
+router.use(bearer, check, auth);
 
 import { PollyClient, SynthesizeSpeechCommand } from '@aws-sdk/client-polly';
 import config from '../config.js';

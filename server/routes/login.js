@@ -37,11 +37,7 @@ router.post('/', function(req, res, next) {
 function check(req, res, next) {
   if (!config.authorization) {
     req.locals = {id: '-', len: 0};
-    if (req.body.Text) {
-      next();
-    } else {
-      res.send('noauthorize');
-    }
+    next();
     return;
   }
 
@@ -55,20 +51,36 @@ function check(req, res, next) {
       req.locals = {id: decoded.sub, len: 0};
     }
     if (req.locals) {
-      if (req.body.Text) {
-        next();
-      } else {
-        res.send('authorized');
-      }
+      next();
       return;
     }
+    req.locals = {message: 'token not found'};
   } catch (err) {
     req.locals = {message: err.message};
   }
   res.status(401).send('unauthorized');
 }
 
+function auth(req, res, next) {
+  const result = config.authorization?'authorized':'noauthorize';
+  if (req.body.Text) {
+    next();
+    return;
+  } else {
+    res.send(result);
+  }
+}
+
+import bearerToken from 'express-bearer-token';
+const bearer = bearerToken({
+  cookie: {
+    key: 'session_cookie'
+  }
+});
+
 export {
   router,
   check,
+  auth,
+  bearer,
 };

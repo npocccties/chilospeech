@@ -10,7 +10,35 @@ router.options("*", cors());
 
 router.post("/", cors(), async function (req, res, next) {
   try {
-    console.log(req.body);
+    const { type, filename, size, numslides, numtopics, duration, message } = req.body;
+    const log = [type];
+    req.locals.log = log;
+    switch(type) {
+    case 'open-directory':
+      break;
+    case 'open-pptx':
+      log[1] = filename;
+      log[2] = size;
+      log[3] = numslides;
+      break;
+    case 'output-video':
+      log[1] = filename;
+      log[2] = numtopics;
+      break;
+    case 'save-video':
+      log[1] = filename;
+      log[2] = size;
+      log[3] = duration;
+      break;
+    case 'error':
+      log[1] = message;
+      break;
+    default:
+      log[0] = 'error';
+      log[1] = 'type unknown';
+      res.status(400).send(log[1]);
+      return;
+    }
     res.send('OK');
   } catch (error) {
     next(error);

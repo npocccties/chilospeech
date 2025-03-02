@@ -3,6 +3,7 @@ import path from 'path';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import { fileURLToPath } from "url";
+import moment from 'moment';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,7 +34,11 @@ morgan.token('info', (req, res) => {
   return `${id} ${len}`;
 });
 
-app.use(morgan(':remote-addr :req[x-forwarded-for] :method :url :status :info'));
+morgan.token('iso8601local', (req, res) => {
+  return moment().toISOString(true);
+})
+
+app.use(morgan(':iso8601local :remote-addr :req[x-forwarded-for] :method :url :status :info'));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

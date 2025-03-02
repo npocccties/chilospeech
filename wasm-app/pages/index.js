@@ -1,12 +1,17 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
-let setRoot, getPptx, setConfig;
+let setRoot, getPptx, setConfig, checkPolly, submitLog;
+let authorized;
+let loginUrl;
 
 if (typeof window !== 'undefined') {
-  ({ setRoot, getPptx, setConfig } = ppt2video);
+  ({ setRoot, getPptx, setConfig, checkPolly, submitLog } = ppt2video);
   const {origin} = location;
   setConfig('pollyProxy', origin + '/app/polly');
   setConfig('ffmpegDir', origin + '/ffmpeg');
+  setConfig('submitLog', origin + '/app/log');
+  authorized = await checkPolly();
+  loginUrl = origin + '/app/start';
 }
 
 let dirHandle = null;
@@ -196,7 +201,12 @@ function App() {
   const [bitrate, setBitrate] = useState(bitrateDefault);
   const [voiceList, setVoiceList] = useState([]);
   const [importJsonList, setImportJsonList] = useState([]);
-
+  const [showLogin, setShowLogin] = useState(false);
+  
+  useEffect(() => {
+    setShowLogin(authorized !== 'noauthorize' && authorized !== 'authorized');
+  }, [])
+ 
   function chengeStep(e) {
     let stepList = document.querySelectorAll(".step li");
     stepList.forEach((step) => {
@@ -370,6 +380,10 @@ function App() {
     setBitrate(Number(e.target.value));
   }
 
+  function handleLogin() {
+    window.location.href = loginUrl;
+  }
+
   return (
     <div id="__next">
       <h2 className="header" >音声合成ビデオ作成システム
@@ -391,7 +405,12 @@ function App() {
       </div>
       <div  id="__step0" className="contents" >	
         <h2 className="step-title">STEP0：音声合成ビデオ作成の流れ</h2>
-        <p class="text note">※ FirefoxとSafariでは使用できませんのでご注意ください。<br/>Google Chrome・Microsoft Edgeのみ使用できます。
+        {showLogin &&
+          <h3 className="step-title">
+            始めにログインしてください
+          </h3>
+        }
+        <p className="text note">※ FirefoxとSafariでは使用できませんのでご注意ください。<br/>Google Chrome・Microsoft Edgeのみ使用できます。
         </p>
         <hr className="hr" />
         <div className="container">
@@ -416,9 +435,16 @@ function App() {
           </div>
         </div>
         <hr className="hr" />
-        <div>
-          <button className="move centered" onClick={handleStep0Next} >STEP1：PPTの選択へ</button>
-        </div>
+        {showLogin &&
+          <div>
+            <button className="move centered" onClick={handleLogin} >ログイン</button>
+          </div>
+        }
+        {!showLogin &&
+          <div>
+            <button className="move centered" onClick={handleStep0Next} >STEP1：PPTの選択へ</button>
+          </div>
+        }
       </div>
       <div  id="__step1" className="contents is-hide" >
         <h2 className="step-title">STEP1：使用するパワーポイントファイルを選択する</h2>

@@ -482,10 +482,20 @@ async function createAudioTopic(topic) {
   }
 }
 
-async function checkPolly() {
+export async function checkPolly() {
   let res;
   try {
     res = await axios.post(config.pollyProxy, {});
+  } catch(e){
+    return e.message;
+  }
+  return res.data;
+}
+
+export async function submitLog(data) {
+  let res;
+  try {
+    res = await axios.post(config.submitLog, data);
   } catch(e){
     return e.message;
   }

@@ -48,6 +48,9 @@ app.use('/login', loginRouter);
 
 if (config.wasm) {
   app.use('/app', wasmRouter);
+  app.get('/app/start', function (req, res) {
+    res.redirect(config.appStartUrl);
+  });
 }
 
 app.use(express.static(path.join(__dirname, 'dist')));

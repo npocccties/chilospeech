@@ -45,8 +45,9 @@ router.post("/", cors(), async function (req, res, next) {
     const data = await SynthesizeSpeech(req.body);
     res.setHeader("content-type", data.ContentType);
     const len = data.RequestCharacters;
-    req.locals.len = len;
     if (config.authorization) access.processed(len);
+    req.locals.len = len;
+    req.locals.mp3size = data.AudioStream.length;
     res.send(data.AudioStream);
   } catch (error) {
     error.statusCode = error.$metadata.httpStatusCode;

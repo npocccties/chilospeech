@@ -69,9 +69,10 @@ const exports = {
 export async function getPptx(filename) {
   try {
     const buf = await readFile(filename);
+    const pptxSize = buf.byteLength;
     const pptx = await getPptxData(buf);
     const filepath = path.parse(filename);
-    return {...pptx, filepath, ...exports};
+    return {...pptx, pptxSize, filepath, ...exports};
   } catch(e) {
     throw new Error("PPTXファイルのオープンに失敗しました。\n" + e.message);
   }

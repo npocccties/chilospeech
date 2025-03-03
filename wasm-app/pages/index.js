@@ -187,6 +187,17 @@ async function processAuthorized() {
   return await pptx.process({authorized: true});
 }
 
+function getStatistics() {
+  let totalFileSize = 0;
+  let totalDuration = 0;
+  for (const section of pptx.sections) {
+    const {fileSize, duration} = section.topics[0];
+    if (fileSize) totalFileSize += fileSize;
+    if (duration) totalDuration += duration;
+  }
+  return {size: totalFileSize, duration: totalDuration};
+}
+
 function App() {
   const [step, setStep] = useState(steps.step1);
   const [pptxList, setPptxList] = useState([]);
@@ -274,7 +285,7 @@ function App() {
     try {
       setError2(null);
       await readPptx();
-      await submitLog({type: 'open-pptx', filename});
+      await submitLog({type: 'open-pptx', filename, size: pptx.pptxSize, numslides: pptx.numSlides});
       setStep(steps.step3);
       chengeStep(2);
     } catch(e) {
@@ -369,7 +380,7 @@ function App() {
     try {
       setError4(null);
       await flushZip();
-      await submitLog({type: 'save-video', filename});
+      await submitLog({type: 'save-video', filename, ...getStatistics()});
       setPptxList([]);
       setFilename(null);
       setTopicList([]);

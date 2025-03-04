@@ -198,6 +198,11 @@ function getStatistics() {
   return {size: totalFileSize, duration: totalDuration};
 }
 
+async function anonymize(s) {
+  const h = await crypto.subtle.digest('sha-256', new ArrayBuffer(s));
+  return btoa(h);
+}
+
 function App() {
   const [step, setStep] = useState(steps.step1);
   const [pptxList, setPptxList] = useState([]);
@@ -285,7 +290,8 @@ function App() {
     try {
       setError2(null);
       await readPptx();
-      await submitLog({type: 'open-pptx', filename, size: pptx.pptxSize, numslides: pptx.numSlides});
+      const filename_hash = await anonymize(filename);
+      await submitLog({type: 'open-pptx', filename: filename_hash, size: pptx.pptxSize, numslides: pptx.numSlides});
       setStep(steps.step3);
       chengeStep(2);
     } catch(e) {
@@ -353,7 +359,8 @@ function App() {
       }
       finalTopicList(timerId);
       await processImportJson(topicCheckList);
-      await submitLog({type: 'output-video', filename, numtopics: numTopics});
+      const filename_hash = await anonymize(filename);
+      await submitLog({type: 'output-video', filename: filename_hash, numtopics: numTopics});
       setStep(steps.step4);
     } catch(e){
       finalTopicList(timerId);
@@ -380,7 +387,8 @@ function App() {
     try {
       setError4(null);
       await flushZip();
-      await submitLog({type: 'save-video', filename, ...getStatistics()});
+      const filename_hash = await anonymize(filename);
+      await submitLog({type: 'save-video', filename: filename_hash, ...getStatistics()});
       setPptxList([]);
       setFilename(null);
       setTopicList([]);

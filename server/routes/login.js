@@ -15,7 +15,16 @@ const option = {
   expiresIn: "7d",
 };
 
-router.post('/', function(req, res, next) {
+async function anonymize(user_id) {
+  const s = user_id.split('@');
+  if (s[0].length > 0) {
+    const h = await crypto.subtle.digest('sha-256', new ArrayBuffer(s[0]));
+    s[0] = btoa(h);
+  }
+  return s.join('@');
+}
+
+router.post('/', async function(req, res, next) {
   const {user_id, password} = req.body;
   if (password === cPassword) {
     const id = nanoid();
@@ -27,7 +36,8 @@ router.post('/', function(req, res, next) {
       secure: false,
       httpOnly: false,
     });
-    req.locals = {id, user_id};
+    const au = await anonymize(user_id);
+    req.locals = {id, user_id: au};
     res.send('OK');
   } else {
     res.status(401).send('unauthorized');

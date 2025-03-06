@@ -69,9 +69,10 @@ const exports = {
 export async function getPptx(filename) {
   try {
     const buf = await readFile(filename);
+    const pptxSize = buf.byteLength;
     const pptx = await getPptxData(buf);
     const filepath = path.parse(filename);
-    return {...pptx, filepath, ...exports};
+    return {...pptx, pptxSize, filepath, ...exports};
   } catch(e) {
     throw new Error("PPTXファイルのオープンに失敗しました。\n" + e.message);
   }
@@ -169,6 +170,7 @@ async function process(options = {}) {
       let data;
       try {
         data = await this.muxTopic(topic, chunks, fps);
+        topic.fileSize = data.byteLength;
       } catch(e){
         throw new Error('can not mux topic.\n' + e.message);
       }
@@ -179,6 +181,7 @@ async function process(options = {}) {
       }
       // update timeRequired in json
       const sum = topic.slides.reduce((acc,slide) => acc + slide.duration,0);
+      topic.duration = sum;
       topic.importJson.timeRequired = sum > 1 ? Math.floor(sum) : 1;
     }
   }

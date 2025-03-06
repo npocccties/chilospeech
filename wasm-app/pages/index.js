@@ -187,6 +187,22 @@ async function processAuthorized() {
   return await pptx.process({authorized: true});
 }
 
+function getStatistics() {
+  let totalFileSize = 0;
+  let totalDuration = 0;
+  for (const section of pptx.sections) {
+    const {fileSize, duration} = section.topics[0];
+    if (fileSize) totalFileSize += fileSize;
+    if (duration) totalDuration += duration;
+  }
+  return {size: totalFileSize, duration: totalDuration};
+}
+
+async function anonymize(s) {
+  const h = await crypto.subtle.digest('sha-256', new ArrayBuffer(s));
+  return btoa(h);
+}
+
 function App() {
   const [step, setStep] = useState(steps.step1);
   const [pptxList, setPptxList] = useState([]);
@@ -238,8 +254,10 @@ function App() {
       setError1(null);
       await openDirectory();
       readDirectory();
+      await submitLog({type: 'open-directory'});
     } catch(e) {
       setError1('ディレクトリを開くことができませんでした。\n' + e.message);
+      await submitLog({type: 'error', message: 'open-directory'});
     }
   }
 
@@ -272,11 +290,14 @@ function App() {
     try {
       setError2(null);
       await readPptx();
+      const filename_hash = await anonymize(filename);
+      await submitLog({type: 'open-pptx', filename: filename_hash, size: pptx.pptxSize, numslides: pptx.numSlides});
       setStep(steps.step3);
       chengeStep(2);
     } catch(e) {
       setError2(e.toString());
       setStep(steps.step3);
+      await submitLog({type: 'error', message: 'open-pptx'});
     }
   }
 
@@ -338,11 +359,14 @@ function App() {
       }
       finalTopicList(timerId);
       await processImportJson(topicCheckList);
+      const filename_hash = await anonymize(filename);
+      await submitLog({type: 'output-video', filename: filename_hash, numtopics: numTopics});
       setStep(steps.step4);
     } catch(e){
       finalTopicList(timerId);
       setError3(e.message);
       setStep(steps.step3);
+      await submitLog({type: 'error', message: 'output-video'});
     }
   }
 
@@ -363,12 +387,15 @@ function App() {
     try {
       setError4(null);
       await flushZip();
+      const filename_hash = await anonymize(filename);
+      await submitLog({type: 'save-video', filename: filename_hash, ...getStatistics()});
       setPptxList([]);
       setFilename(null);
       setTopicList([]);
       readDirectory();
     } catch(e){
       setError4('zipファイルの保存に失敗しました。\n' + e.message);
+      await submitLog({type: 'error', message: 'save-video'});
     }
   }
 

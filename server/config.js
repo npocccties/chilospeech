@@ -9,6 +9,8 @@ const config = {
   logdir: process.env.POLLY_LOGDIR || "log",
   wasm: (process.env.POLLY_WASM === "true") || false,
   appStartUrl: process.env.POLLY_APP_START_URL || 'https://localhost:3006/dialog/start',
+  httplogdir: process.env.POLLY_HTTPLOGDIR || "httplog",
+  teeToStdout: (process.env.POLLY_TEETOSTDOUT === "true") || false,
 };
 
 export default config;

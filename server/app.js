@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import { fileURLToPath } from "url";
 import moment from 'moment';
+import { createStream } from 'rotating-file-stream';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,6 +24,13 @@ function pollyErrorHandler (err, req, res, next) {
     next(err);
   }
 }
+
+const logStream = createStream('log.txt',{
+  interval: '1d',
+  path: path.join(__dirname, config.httplogdir),
+  immutable: true,
+  teeToStdout: config.teeToStdout,
+});
 
 morgan.token('info', (req, res) => {
   if (!req.locals) return "- -";
@@ -48,7 +56,9 @@ morgan.token('iso8601local', (req, res) => {
   return moment().toISOString(true);
 })
 
-app.use(morgan(':iso8601local :remote-addr :req[x-forwarded-for] :method :url :status :info'));
+app.use(morgan(':iso8601local :remote-addr :req[x-forwarded-for] :method :url :status :info', {
+  stream: logStream,
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

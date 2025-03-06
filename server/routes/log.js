@@ -10,7 +10,15 @@ router.options("*", cors());
 
 router.post("/", cors(), async function (req, res, next) {
   try {
-    const { type, filename, size, numslides, numtopics, duration, message } = req.body;
+    const {
+      type,
+      filename = '-',
+      size = 0,
+      numslides = 0,
+      numtopics = 0,
+      duration = 0,
+      message = '-',
+    } = req.body;
     const log = [type];
     req.locals.log = log;
     switch(type) {

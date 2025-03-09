@@ -27,7 +27,7 @@ function pollyErrorHandler (err, req, res, next) {
 
 const logStream = createStream('log.txt',{
   interval: '1d',
-  path: path.join(__dirname, config.httplogdir),
+  path: config.httplogdir,
   immutable: true,
   teeToStdout: config.teeToStdout,
 });

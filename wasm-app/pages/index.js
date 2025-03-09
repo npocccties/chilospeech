@@ -350,17 +350,19 @@ function App() {
       setError3(null);
       setStep(steps.step35);
       timerId = setInterval(timerFunction, 100);
+      let count = 0;
       for (let i = 0; i < numTopics; i++) {
         if (topicCheckList[i]) {
           topicState(i, states.running);
           await processTopic(i, FPS, bitrate);
           topicState(i, states.success);
+          count = count + 1;
         }          
       }
       finalTopicList(timerId);
       await processImportJson(topicCheckList);
       const filename_hash = await anonymize(filename);
-      await submitLog({type: 'output-video', filename: filename_hash, numtopics: numTopics});
+      await submitLog({type: 'output-video', filename: filename_hash, numtopics: count});
       setStep(steps.step4);
     } catch(e){
       finalTopicList(timerId);

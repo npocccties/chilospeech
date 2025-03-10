@@ -18,8 +18,8 @@ const option = {
 async function anonymize(user_id) {
   const s = user_id.split('@');
   if (s[0].length > 0) {
-    const h = await crypto.subtle.digest('sha-256', new ArrayBuffer(s[0]));
-    s[0] = btoa(h);
+    const h = await crypto.subtle.digest('sha-256', new TextEncoder().encode(s[0]));
+    s[0] = btoa(String.fromCharCode.apply(null, new Uint8Array(h)));
   }
   return s.join('@');
 }

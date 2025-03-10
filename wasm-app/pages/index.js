@@ -199,8 +199,8 @@ function getStatistics() {
 }
 
 async function anonymize(s) {
-  const h = await crypto.subtle.digest('sha-256', new ArrayBuffer(s));
-  return btoa(h);
+  const h = await crypto.subtle.digest('sha-256', new TextEncoder().encode(s));
+  return btoa(String.fromCharCode.apply(null, new Uint8Array(h)));
 }
 
 function App() {

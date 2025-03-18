@@ -116,28 +116,24 @@ $ PROT=http POLLY_WASM=true POLLY_AUTHORIZATION=true node bin/www
   - sample-login, sample-gakunin と組み合わせてアクセス制限機能に対応する
   - 認証されたユーザだけが アドイン,WASM版を使用できる
   - 使用量制限や使用量ログの記録が行える
+  - アクセス制限の詳細は docs/spec/access.md に記載
 
-```
-::1 - POST /app/polly 200 2a6402f655 24
-::1 - POST /app/polly 200 2a6402f655 35
-::1 - POST /app/polly 200 2a6402f655 46
-```
 - パス
 
 アドインとWASM版が使用するパスは、以下のとおりです。
 
 |用途      |パス              |サーバ |
 |----------|------------------|------------------------- |
-|addin     |/polly            |polly proxy |
+|addin     |/polly            |polly proxy (トークン) |
 |addin     |/login            |polly proxy |
 |addin     |/index.html       |Apache または polly proxy |
 |addin     |/finished.html    |Apache または polly proxy |
 |addin     |/dialog/start     |学認SP, sample-gakunin    |
 |WASM版*1  |/app/start        |学認SP, sample-gakunin    |
-|WASM版*2  |/app/index.html   |Apache または polly proxy |
-|WASM版*3  |/app/polly        |polly proxy (トークン)    |
-|WASM版*4  |/app/log          |polly proxy (トークン)    |
-|WASM版    |/ffmpeg/...       |Apache または polly proxy |
+|WASM版*2  |/app/index.html   |polly proxy |
+|WASM版*3  |/app/polly        |polly proxy (トークン) |
+|WASM版*4  |/app/log          |polly proxy (トークン) |
+|WASM版    |/ffmpeg/...       |polly proxy |
 
 *1 sample-gakunin を addin 用とは別設定でもう1つ追加で動作させる
 *2 WASM版 /app/index.html は SP 配下に入れない

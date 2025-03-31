@@ -1,3 +1,5 @@
+import webpack from 'webpack';
+
 const cmd_config = {
   entry: "./bin/ppt2video.js",
 
@@ -21,10 +23,22 @@ const cmd_config = {
 
   ignoreWarnings: [
     {
-      module: /log4js|aws-crt/,
+      module: /log4js/,
       message: /Critical dependency: the request of a dependency is an expression/,
     },
   ],
+
+  plugins: [
+    new webpack.IgnorePlugin({
+      resourceRegExp: /canvas/,
+      contextRegExp: /jsdom$/,
+    }),
+  ],
+
+  externals: {
+    bufferutil: "bufferutil",
+    "utf-8-validate": "utf-8-validate",
+  },
 };
 
 const script_config = {

@@ -24,7 +24,7 @@
     "jszip": "^3.10.1",
     "log4js": "^6.9.1",
     "minimist": "^1.2.8",
-    "music-metadata-browser": "^2.5.11",
+    "music-metadata": "^11.0.2",
     "path-browserify": "^1.0.1",
     "speechmarkdown-js": "https://github.com/npocccties/speechmarkdown-js#ties-with-dist",
     "stream": "^0.0.3",

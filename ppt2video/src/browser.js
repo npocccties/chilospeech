@@ -1,5 +1,5 @@
 import {Buffer} from 'buffer';
-import mm from 'music-metadata-browser';
+import {parseBuffer} from 'music-metadata';
 import axios from 'axios';
 import * as path from 'path-browserify';
 
@@ -450,7 +450,7 @@ if (ltik) {
 
 async function getSoundDuration(data) {
   const buf = Buffer.from(data);
-  const mmp = await mm.parseBuffer(buf);
+  const mmp = await parseBuffer(buf);
   return mmp.format.duration;
 }
 

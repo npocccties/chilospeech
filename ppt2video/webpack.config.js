@@ -2,7 +2,8 @@ const cmd_config = {
   entry: "./bin/ppt2video.js",
 
   output: {
-    filename: "ppt2video.js"
+    filename: "ppt2video.js",
+    asyncChunks: false,
   },
 
   name: "node",
@@ -32,6 +33,7 @@ const script_config = {
   output: {
     filename: "browser.js",
     library: "ppt2video",
+    asyncChunks: false,
   },
 
   name: "web",
@@ -78,6 +80,7 @@ const lib_config = {
     library: {
       type: 'module',
     },
+    asyncChunks: false,
   },
 
   name: "lib",

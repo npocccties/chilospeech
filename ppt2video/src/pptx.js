@@ -56,7 +56,7 @@ function extractLine(chunks) {
   for (const chunk of chunks) {
     ret.push(chunk['a:t']);
   }
-  return ret.join('').split('\r\n');
+  return ret.join('').split(/\r?\n/);
 }
 
 function block2lines(block) {
@@ -135,7 +135,7 @@ function getTextXpath(dom, type){
       }
     }
     if (node.parentNode.parentNode.parentNode.nodeName !== "mc:Fallback") {
-      ret.push(line.join('').split('\r\n'));
+      ret.push(line.join('').split(/\r?\n/));
     }
     node = lines.iterateNext();
   }
